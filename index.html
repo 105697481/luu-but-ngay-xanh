@@ -213,15 +213,7 @@
     display:flex; gap: clamp(20px,3vw,42px);
     padding: 0 8vw;
     will-change: transform;
-    /* Native swipe/scroll fallback: works even if the scroll-linked JS
-       above never runs (blocked script, slow CDN, in-app browser, etc.) */
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity;
-    scrollbar-width: thin;
   }
-  .gallery-track::-webkit-scrollbar{ height: 6px; }
-  .gallery-track::-webkit-scrollbar-thumb{ background: var(--ink-soft); border-radius: 3px; }
   .photo-card{
     flex: 0 0 auto;
     width: clamp(200px, 30vw, 300px);
@@ -229,7 +221,6 @@
     border: 1px solid rgba(58,42,28,.25);
     box-shadow: 6px 6px 0 var(--shadow);
     padding: 14px 14px 20px;
-    scroll-snap-align: center;
   }
   .photo-card:nth-child(odd){ transform: rotate(-2deg); }
   .photo-card:nth-child(even){ transform: rotate(2deg); }
@@ -583,9 +574,7 @@
    NOT depend on Firebase or any external network import. This keeps the
    gallery scroll working even if the Firebase CDN import below is slow,
    blocked by an ad-blocker/firewall, or fails inside certain in-app
-   browsers (Zalo, Messenger, etc.). A native swipe/scroll fallback is
-   also enabled via CSS (overflow-x:auto on .gallery-track), so photos
-   can always be viewed by swiping even if this script never ran. */
+   browsers (Zalo, Messenger, etc.). */
 (function(){
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -603,7 +592,6 @@
   var galleryTrack = document.getElementById('galleryTrack');
   var floatingLetter = document.getElementById('floatingLetter');
   var ticking = false;
-  var userDragging = false;
 
   function galleryProgress(){
     var rect = gallerySection.getBoundingClientRect();
@@ -618,7 +606,7 @@
     ticking = false;
     var p = galleryProgress();
 
-    if(!reduceMotion && galleryTrack && !userDragging){
+    if(!reduceMotion && galleryTrack){
       var trackWidth = galleryTrack.scrollWidth;
       var viewportW = window.innerWidth;
       var maxShift = Math.max(0, trackWidth - viewportW + 40);
@@ -636,18 +624,6 @@
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
-
-  /* If someone manually swipes/drags the gallery track (native overflow
-     scroll fallback), stop overriding it with the scroll-linked transform
-     so their swipe isn't fought by the page-scroll transform. */
-  if(galleryTrack){
-    galleryTrack.addEventListener('scroll', function(){
-      userDragging = true;
-      galleryTrack.style.transform = 'none';
-      clearTimeout(galleryTrack._dragTimer);
-      galleryTrack._dragTimer = setTimeout(function(){ userDragging = false; }, 1200);
-    }, { passive: true });
-  }
 
   update();
 })();
