@@ -223,6 +223,7 @@
     overflow:hidden;
   }
   .photo-frame svg{ width: 58%; height:58%; stroke: var(--ink-soft); }
+  .photo-frame img{ width:100%; height:100%; object-fit: cover; display:block; }
   .photo-frame::after{
     content:''; position:absolute; inset:0;
     background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.35), transparent 55%);
@@ -407,85 +408,106 @@
     <div class="gallery-track" id="galleryTrack">
       <div class="photo-card">
         <div class="photo-frame">
-          <svg viewBox="0 0 100 100" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 78 L20 30 L50 15 L80 30 L80 78 Z"/>
-            <path d="M35 78 V55 H65 V78"/>
-            <path d="M50 15 V5 M44 8 h12"/>
-          </svg>
+          <img src="images/anh-01.jpg" alt="Tiệc sinh nhật ngoài trời buổi tối" loading="lazy">
         </div>
-        <h4>Giảng Đường</h4>
-        <p>NHỮNG GIỜ HỌC MIỆT MÀI TRÊN GHẾ NHÀ TRƯỜNG</p>
+        <h4>Sinh Nhật Đường Phố</h4>
+        <p>CHIẾC BÁNH KEM VÀ TIẾNG CƯỜI GIỮA ĐÊM ĐÀ NẴNG</p>
       </div>
 
       <div class="photo-card">
         <div class="photo-frame">
-          <svg viewBox="0 0 100 100" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M30 20 v25 a15 15 0 0 0 30 0 V20"/>
-            <path d="M60 45 v10 a15 15 0 0 1 -30 0"/>
-            <circle cx="72" cy="55" r="7"/>
-            <path d="M65 55 h-5"/>
-          </svg>
+          <img src="images/anh-02.jpg" alt="Cả nhóm chụp ảnh tự sướng mừng sinh nhật" loading="lazy">
         </div>
-        <h4>Đêm Trực</h4>
-        <p>ỐNG NGHE THEO YAN QUA BAO CA TRỰC ĐÊM</p>
+        <h4>Khoảnh Khắc Tự Sướng</h4>
+        <p>CHEN NHAU VÀO KHUNG HÌNH, CƯỜI KHÔNG NGỚT</p>
       </div>
 
       <div class="photo-card">
         <div class="photo-frame">
-          <svg viewBox="0 0 100 100" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M35 25 q-8 15 0 30 q8 15 0 30" />
-            <path d="M65 25 q8 15 0 30 q-8 15 0 30" />
-            <path d="M50 20 v60"/>
-          </svg>
+          <img src="images/anh-03.jpg" alt="Nhóm bạn check-in trước cổng Danang Downtown" loading="lazy">
         </div>
-        <h4>Phòng Thực Hành</h4>
-        <p>CLOUDY CẦN MẪN VỚI TỪNG DỤNG CỤ NHA KHOA</p>
+        <h4>Đà Nẵng Downtown</h4>
+        <p>CẢ NHÓM CHECK-IN GIỮA LÒNG PHỐ THỊ</p>
       </div>
 
       <div class="photo-card">
         <div class="photo-frame">
-          <svg viewBox="0 0 100 100" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 65 Q30 30 50 65 Q70 30 90 65"/>
-            <path d="M10 72 h80"/>
-            <path d="M25 65 v7 M50 65 v7 M75 65 v7"/>
-          </svg>
+          <img src="images/anh-04.jpg" alt="Tạo dáng hài hước khi xếp hàng chơi trò chơi" loading="lazy">
         </div>
-        <h4>Cầu Rồng</h4>
-        <p>ĐÀ NẴNG — NƠI THANH XUÂN ĐÃ Ở LẠI</p>
+        <h4>Tạo Dáng Vui Nhộn</h4>
+        <p>GƯƠNG MẶT HÀI HƯỚC KHÔNG THỂ NHỊN CƯỜI</p>
       </div>
 
       <div class="photo-card">
         <div class="photo-frame">
-          <svg viewBox="0 0 100 100" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 45 L50 28 L85 45 L50 62 Z"/>
-            <path d="M50 62 V80"/>
-            <path d="M32 50 v18 q18 10 36 0 v-18"/>
-          </svg>
+          <img src="images/anh-05.jpg" alt="Xếp hàng chờ vào chơi cùng nhau" loading="lazy">
         </div>
-        <h4>Ngày Vinh Danh</h4>
-        <p>CHIẾC MŨ TỐT NGHIỆP TUNG BAY GIỮA TRỜI</p>
+        <h4>Xếp Hàng Chờ Chơi</h4>
+        <p>CHEN CHÚC XẾP HÀNG, VUI VẺ KHÔNG NGƠI</p>
       </div>
 
       <div class="photo-card">
         <div class="photo-frame">
-          <svg viewBox="0 0 100 100" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M30 45 h30 v20 a15 12 0 0 1 -30 0 Z"/>
-            <path d="M60 50 q10 0 10 8 q0 8 -10 8"/>
-            <path d="M38 30 q0 -8 4 -10 M48 30 q0 -8 4 -10"/>
-          </svg>
+          <img src="images/anh-06.jpg" alt="Cả nhóm đứng trước vòng quay mặt trời" loading="lazy">
         </div>
-        <h4>Mùa Ôn Thi</h4>
-        <p>CÀ PHÊ ĐẮNG, ĐÈN BÀN KHUYA, NHỮNG NGÀY KHÔNG NGỦ</p>
+        <h4>Vòng Quay Ký Ức</h4>
+        <p>VÒNG QUAY MẶT TRỜI VÀ NHỮNG LÁ CỜ ĐỎ TUNG BAY</p>
       </div>
 
       <div class="photo-card">
         <div class="photo-frame">
-          <svg viewBox="0 0 100 100" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M50 78 C20 55 15 35 30 25 C40 18 50 25 50 35 C50 25 60 18 70 25 C85 35 80 55 50 78 Z"/>
-          </svg>
+          <img src="images/anh-07.jpg" alt="Nghỉ chân sau khi chơi tàu lượn" loading="lazy">
         </div>
-        <h4>Tình Bạn</h4>
-        <p>MỘT HÀNH TRÌNH, MỘT TÌNH BẠN ĐI CÙNG NĂM THÁNG</p>
+        <h4>Giờ Nghỉ Giữa Chuyến Chơi</h4>
+        <p>NGỒI NGHỈ SAU VÒNG QUAY CẢM GIÁC MẠNH</p>
+      </div>
+
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="images/anh-08.jpg" alt="Tiệc nhỏ bên sông với đèn dây lung linh" loading="lazy">
+        </div>
+        <h4>Tiệc Nhỏ Bên Sông</h4>
+        <p>ÁNH ĐÈN LUNG LINH, BÁNH KEM NGỌT NGÀO</p>
+      </div>
+
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="images/anh-09.jpg" alt="Tiệc Giáng Sinh trong quán cà phê" loading="lazy">
+        </div>
+        <h4>Giáng Sinh Ấm Áp</h4>
+        <p>TIỆC NGỦ, BÁNH KEM VÀ NHỮNG BỘ ĐỒ NGỘ NGHĨNH</p>
+      </div>
+
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="images/anh-10.jpg" alt="Đêm Noel với mặt nạ vui nhộn" loading="lazy">
+        </div>
+        <h4>Đêm Noel Rộn Ràng</h4>
+        <p>MẶT NẠ VUI NHỘN GIỮA MÙA GIÁNG SINH</p>
+      </div>
+
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="images/anh-11.jpg" alt="Bữa cơm sum vầy cùng bạn bè" loading="lazy">
+        </div>
+        <h4>Bữa Cơm Sum Vầy</h4>
+        <p>QUÂY QUẦN BÊN MÂM CƠM, CHUYỆN TRÒ RÔM RẢ</p>
+      </div>
+
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="images/anh-12.jpg" alt="Chụp ảnh giữa sân vườn cây xanh" loading="lazy">
+        </div>
+        <h4>Góc Sân Vườn Xanh Mát</h4>
+        <p>TRÒ ĐÙA VÀ NHỮNG PHỤ KIỆN KỲ LẠ</p>
+      </div>
+
+      <div class="photo-card">
+        <div class="photo-frame">
+          <img src="images/anh-13.jpg" alt="Trao quà và lời chúc mừng năm mới" loading="lazy">
+        </div>
+        <h4>Chào Năm Mới</h4>
+        <p>TRAO NHAU LỜI CHÚC VÀ NHỮNG MÓN QUÀ CUỐI NĂM</p>
       </div>
     </div>
 
@@ -693,29 +715,4 @@ var db = getFirestore(fbApp);
     var now = new Date();
     var dateStr = now.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
 
-    addDoc(collection(db, LETTERS_COLLECTION), {
-      name: name,
-      message: message,
-      date: dateStr,
-      createdAt: serverTimestamp()
-    }).then(function(){
-      flyLetter(sendBtn);
-      formMsg.style.color = '';
-      formMsg.textContent = 'Đã gửi! Cảm ơn ' + name + ' đã lưu lại vài dòng trong sổ lưu bút 💛';
-      form.reset();
-    }).catch(function(err){
-      console.error(err);
-      formMsg.style.color = 'var(--stamp-red)';
-      formMsg.textContent = 'Rất tiếc, gửi lời chúc chưa thành công. Vui lòng thử lại.';
-    }).finally(function(){
-      sendBtn.disabled = false;
-      sendBtn.textContent = prevLabel;
-      setTimeout(function(){ formMsg.textContent = ''; }, 5000);
-    });
-  });
-
-})();
-</script>
-
-</body>
-</html>
+    addDoc(collection
