@@ -133,6 +133,18 @@
     min-width: 220px;
     position: relative;
   }
+  .name-card .avatar{
+    width: clamp(72px, 9vw, 92px);
+    height: clamp(72px, 9vw, 92px);
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 15%;
+    border: 2px solid var(--ink-soft);
+    box-shadow: 3px 3px 0 var(--shadow);
+    background: var(--paper);
+    display: block;
+    margin: 0 auto .8rem;
+  }
   .name-card:nth-child(1){ transform: rotate(-2.4deg); }
   .name-card:nth-child(2){ transform: rotate(2deg); }
   .name-card .tape{
@@ -193,7 +205,7 @@
     border-bottom: 3px double var(--ink-soft);
   }
   .gallery-sticky{
-    position: sticky; top:0; height:100svh; overflow:hidden;
+    position: sticky; top:0; height:100vh; height:100svh; overflow:hidden;
     display:flex; flex-direction:column; justify-content:center;
   }
   .gallery-heading{ text-align:center; margin-bottom: clamp(1.4rem,4vh,2.6rem); padding: 0 6vw;}
@@ -201,7 +213,15 @@
     display:flex; gap: clamp(20px,3vw,42px);
     padding: 0 8vw;
     will-change: transform;
+    /* Native swipe/scroll fallback: works even if the scroll-linked JS
+       above never runs (blocked script, slow CDN, in-app browser, etc.) */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
   }
+  .gallery-track::-webkit-scrollbar{ height: 6px; }
+  .gallery-track::-webkit-scrollbar-thumb{ background: var(--ink-soft); border-radius: 3px; }
   .photo-card{
     flex: 0 0 auto;
     width: clamp(200px, 30vw, 300px);
@@ -209,6 +229,7 @@
     border: 1px solid rgba(58,42,28,.25);
     box-shadow: 6px 6px 0 var(--shadow);
     padding: 14px 14px 20px;
+    scroll-snap-align: center;
   }
   .photo-card:nth-child(odd){ transform: rotate(-2deg); }
   .photo-card:nth-child(even){ transform: rotate(2deg); }
@@ -373,11 +394,13 @@
   <div class="name-row">
     <div class="name-card">
       <div class="tape"></div>
+      <img class="avatar" src="images/avatar-cloudy.png" alt="Ảnh chân dung Cloudy" loading="lazy">
       <h3>Cloudy</h3>
       <p>Bác sĩ Răng – Hàm – Mặt</p>
     </div>
     <div class="name-card">
       <div class="tape"></div>
+      <img class="avatar" src="images/avatar-yan.png" alt="Ảnh chân dung Yan" loading="lazy">
       <h3>Yan</h3>
       <p>Điều dưỡng</p>
     </div>
@@ -553,16 +576,16 @@
   <span class="fl-icon">✉️</span><span id="flCount">0</span>&nbsp;lá thư
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import { firebaseConfig, LETTERS_COLLECTION } from "./firebase-config.js";
-
-var fbApp = initializeApp(firebaseConfig);
-var db = getFirestore(fbApp);
-
+<script>
+/* ---------- Plain, non-module script ----------
+   Everything in here (page reveal animations, the scroll-driven photo
+   gallery, and the floating-letter position) runs immediately and does
+   NOT depend on Firebase or any external network import. This keeps the
+   gallery scroll working even if the Firebase CDN import below is slow,
+   blocked by an ad-blocker/firewall, or fails inside certain in-app
+   browsers (Zalo, Messenger, etc.). A native swipe/scroll fallback is
+   also enabled via CSS (overflow-x:auto on .gallery-track), so photos
+   can always be viewed by swiping even if this script never ran. */
 (function(){
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -575,11 +598,12 @@ var db = getFirestore(fbApp);
   }, { threshold: .18 });
   fadeEls.forEach(function(el){ io.observe(el); });
 
-  /* ---------- scroll-driven gallery + floating letter ---------- */
+  /* ---------- scroll-driven gallery + floating letter position ---------- */
   var gallerySection = document.getElementById('gallerySection');
   var galleryTrack = document.getElementById('galleryTrack');
   var floatingLetter = document.getElementById('floatingLetter');
   var ticking = false;
+  var userDragging = false;
 
   function galleryProgress(){
     var rect = gallerySection.getBoundingClientRect();
@@ -594,7 +618,7 @@ var db = getFirestore(fbApp);
     ticking = false;
     var p = galleryProgress();
 
-    if(!reduceMotion && galleryTrack){
+    if(!reduceMotion && galleryTrack && !userDragging){
       var trackWidth = galleryTrack.scrollWidth;
       var viewportW = window.innerWidth;
       var maxShift = Math.max(0, trackWidth - viewportW + 40);
@@ -612,7 +636,36 @@ var db = getFirestore(fbApp);
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
+
+  /* If someone manually swipes/drags the gallery track (native overflow
+     scroll fallback), stop overriding it with the scroll-linked transform
+     so their swipe isn't fought by the page-scroll transform. */
+  if(galleryTrack){
+    galleryTrack.addEventListener('scroll', function(){
+      userDragging = true;
+      galleryTrack.style.transform = 'none';
+      clearTimeout(galleryTrack._dragTimer);
+      galleryTrack._dragTimer = setTimeout(function(){ userDragging = false; }, 1200);
+    }, { passive: true });
+  }
+
   update();
+})();
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { firebaseConfig, LETTERS_COLLECTION } from "./firebase-config.js";
+
+var fbApp = initializeApp(firebaseConfig);
+var db = getFirestore(fbApp);
+
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var floatingLetter = document.getElementById('floatingLetter');
 
   /* ---------- guestbook storage (Firestore, dùng chung cho mọi người) ---------- */
   var list = document.getElementById('guestbookList');
