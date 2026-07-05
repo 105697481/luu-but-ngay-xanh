@@ -1,3 +1,3 @@
 # Luu But Ngay Xanh
 
-Trang luu but tot nghiep Cloudy & Yan. ✓
+Trang luu but tot nghiep Cloudy & Yan. ✓✓
