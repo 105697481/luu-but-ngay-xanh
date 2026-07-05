@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phòng Lưu Trữ — Quản Trị Sổ Lưu Bút</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,500&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #efe4c8;
+    --paper-2: #e6d7b3;
+    --paper-dark: #d8c69a;
+    --ink: #3a2a1c;
+    --ink-soft: #6b5138;
+    --stamp-red: #9b3f31;
+    --teal: #3e5f57;
+    --gold: #ab7a25;
+    --card-bg: #f4ead0;
+    --shadow: rgba(58, 42, 28, 0.35);
+    --serif: 'Playfair Display', 'Times New Roman', serif;
+    --sans: 'Be Vietnam Pro', sans-serif;
+    --type: 'Special Elite', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100svh;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grain{
+    position: fixed; inset: 0; z-index: 500; pointer-events: none;
+    opacity: .16; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
+  }
+  .vignette{
+    position: fixed; inset:0; z-index: 499; pointer-events:none;
+    box-shadow: inset 0 0 18vw rgba(58,42,28,0.45);
+  }
+
+  .hidden{ display:none !important; }
+
+  .eyebrow{
+    font-family: var(--type);
+    letter-spacing: .2em;
+    font-size: clamp(.6rem, 1.3vw, .78rem);
+    color: var(--stamp-red);
+  }
+
+  /* ---------- login ---------- */
+  .login-screen{
+    position: relative; z-index: 2;
+    min-height: 100svh;
+    display:flex; align-items:center; justify-content:center;
+    padding: 6vh 6vw;
+    background:
+      radial-gradient(ellipse at 20% 15%, rgba(171,122,37,.18), transparent 55%),
+      radial-gradient(ellipse at 85% 85%, rgba(62,95,87,.15), transparent 50%),
+      var(--paper);
+  }
+  .login-box{
+    max-width: 460px; width:100%;
+    background: var(--card-bg);
+    border: 1px solid var(--ink-soft);
+    box-shadow: 8px 8px 0 var(--shadow);
+    padding: clamp(1.8rem,4vw,3rem);
+    text-align:center;
+    position: relative;
+  }
+  .login-box::before{
+    content:''; position:absolute; top:-10px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+    width: 70px; height:20px; background: rgba(200,180,130,.6);
+    border: 1px solid rgba(58,42,28,.15);
+  }
+  .seal{
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--stamp-red);
+    outline: 1px dashed var(--stamp-red);
+    outline-offset: 5px;
+    display:flex; align-items:center; justify-content:center; flex-direction:column;
+    color: var(--stamp-red);
+    font-family: var(--type);
+    font-size: .62rem;
+    letter-spacing: .06em;
+    transform: rotate(-6deg);
+    margin: 1.2rem auto 1.4rem;
+    background: rgba(155,63,49,.03);
+  }
+  .seal span:first-child{ font-size: 1.5em; margin-bottom: 2px; }
+  .login-box h1{
+    font-family: var(--serif); font-weight:700; font-size: clamp(1.5rem,4vw,2rem);
+    margin: .6rem 0 .8rem;
+  }
+  .login-box .sub{
+    color: var(--ink-soft); font-size:.95rem; line-height:1.6; margin: 0 auto 1.8rem; max-width: 38ch;
+  }
+
+  .field{ margin-bottom: 1.4rem; text-align:left; }
+  .field label{
+    display:block; font-family: var(--type); font-size:.75rem; letter-spacing:.08em;
+    color: var(--ink-soft); margin-bottom:.5rem;
+  }
+  .field input, .field textarea{
+    width:100%; font-family: var(--sans); font-size:1rem; color: var(--ink);
+    background: rgba(255,252,240,.6);
+    border: none; border-bottom: 2px solid var(--ink-soft);
+    padding: .6rem .2rem; outline:none; resize: vertical;
+  }
+  .field input:focus, .field textarea:focus{ border-color: var(--stamp-red); background: rgba(255,252,240,.9); }
+  .field textarea{ min-height: 110px; }
+
+  .btn-send{
+    font-family: var(--type); letter-spacing:.08em; font-size:.88rem;
+    color: var(--paper); background: var(--stamp-red);
+    border: 1px solid var(--ink); padding: .85rem 1.7rem;
+    cursor:pointer; box-shadow: 4px 4px 0 var(--shadow);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-send:hover{ transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--shadow); }
+  .btn-send:active{ transform: translate(0,0); box-shadow: 2px 2px 0 var(--shadow); }
+  .btn-send:disabled{ opacity:.6; cursor: default; transform:none; }
+
+  .btn-ghost{
+    font-family: var(--type); letter-spacing:.08em; font-size:.82rem;
+    color: var(--ink); background: transparent;
+    border: 1px solid var(--ink-soft); padding: .7rem 1.3rem;
+    cursor:pointer; transition: background .15s ease, color .15s ease;
+  }
+  .btn-ghost:hover{ background: var(--ink-soft); color: var(--paper); }
+
+  .btn-danger{
+    font-family: var(--type); letter-spacing:.08em; font-size:.82rem;
+    color: var(--paper); background: var(--stamp-red);
+    border: 1px solid var(--ink); padding: .7rem 1.3rem;
+    cursor:pointer; box-shadow: 3px 3px 0 var(--shadow);
+  }
+  .btn-danger:hover{ transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--shadow); }
+
+  .btn-icon{
+    font-family: var(--type); font-size:.7rem; letter-spacing:.05em;
+    border: 1px solid var(--ink-soft); background: rgba(255,252,240,.5);
+    color: var(--ink); padding:.4rem .7rem; cursor:pointer;
+  }
+  .btn-icon:hover{ background: var(--paper-dark); }
+  .btn-icon.danger{ color: var(--stamp-red); border-color: var(--stamp-red); }
+  .btn-icon.danger:hover{ background: rgba(155,63,49,.12); }
+
+  .form-msg{ font-size:.86rem; margin-top: .9rem; color: var(--teal); font-style: italic; min-height: 1.2em; }
+  .form-msg.err{ color: var(--stamp-red); }
+
+  /* ---------- dashboard ---------- */
+  .dashboard{ position: relative; z-index:2; max-width: 1180px; margin: 0 auto; padding: clamp(1.4rem,4vw,2.6rem) 6vw 5rem; }
+
+  .admin-header{
+    display:flex; align-items:flex-end; justify-content:space-between; gap: 1.4rem;
+    flex-wrap: wrap;
+    border-bottom: 3px double var(--ink-soft);
+    padding-bottom: 1.4rem; margin-bottom: 1.6rem;
+  }
+  .admin-header h1{
+    font-family: var(--serif); font-weight:700; font-size: clamp(1.5rem,3.4vw,2.1rem);
+    margin: .4rem 0 0;
+  }
+  .admin-actions{ display:flex; align-items:center; gap: 1rem; flex-wrap: wrap; }
+  .count-badge{
+    font-family: var(--type); font-size:.78rem; letter-spacing:.06em;
+    background: var(--card-bg); border: 1px solid var(--ink-soft);
+    padding: .5rem .9rem; color: var(--ink-soft);
+  }
+
+  .toolbar{ margin-bottom: 1.8rem; }
+  .toolbar input{
+    width:100%; max-width: 420px;
+    font-family: var(--sans); font-size:.95rem; color: var(--ink);
+    background: var(--card-bg);
+    border: 1px solid var(--ink-soft);
+    padding: .75rem 1rem; outline:none;
+  }
+  .toolbar input:focus{ border-color: var(--stamp-red); }
+
+  .cards-wrap{
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.4rem;
+  }
+  .postcard{
+    background: var(--card-bg);
+    border: 1px solid rgba(58,42,28,.3);
+    box-shadow: 5px 5px 0 var(--shadow);
+    padding: 1.2rem 1.3rem;
+    display:flex; flex-direction:column;
+    transform: rotate(var(--r, -1deg));
+  }
+  .postcard .pc-name{
+    font-family: var(--serif); font-weight:700; font-size:1.05rem; margin:0 0 .3rem;
+    color: var(--ink);
+  }
+  .postcard .pc-date{
+    font-family: var(--type); font-size:.65rem; color: var(--ink-soft); margin-bottom:.6rem; display:block;
+  }
+  .postcard .pc-msg{
+    font-size:.92rem; line-height:1.55; color: var(--ink); margin:0 0 1rem;
+    white-space: pre-wrap; flex-grow:1;
+  }
+  .postcard .pc-edited{
+    font-family: var(--type); font-size:.62rem; color: var(--teal); margin-bottom:.6rem;
+  }
+  .pc-actions{ display:flex; gap:.6rem; margin-top: auto; }
+
+  .empty-state{
+    font-family: var(--serif); font-style:italic; color: var(--ink-soft); margin-top:3rem; text-align:center;
+  }
+
+  /* ---------- modals ---------- */
+  .modal-overlay{
+    position: fixed; inset:0; z-index: 800;
+    background: rgba(58,42,28,.55);
+    display:flex; align-items:center; justify-content:center;
+    padding: 5vh 6vw;
+  }
+  .modal-box{
+    max-width: 480px; width:100%;
+    background: var(--card-bg);
+    border: 1px solid var(--ink-soft);
+    box-shadow: 8px 8px 0 var(--shadow);
+    padding: clamp(1.6rem,4vw,2.2rem);
+    max-height: 85vh; overflow:auto;
+  }
+  .modal-box p{ font-size:.95rem; line-height:1.6; color: var(--ink); }
+  .modal-actions{ display:flex; justify-content:flex-end; gap: .8rem; margin-top: 1rem; }
+
+  @media (max-width: 640px){
+    .admin-header{ flex-direction:column; align-items:flex-start; }
+    .cards-wrap{ grid-template-columns: 1fr; }
+    .modal-actions{ flex-direction:column-reverse; }
+    .modal-actions button{ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<div id="loginScreen" class="login-screen">
+  <div class="login-box">
+    <div class="eyebrow">TRƯỜNG Y DƯỢC &nbsp;–&nbsp; ĐẠI HỌC ĐÀ NẴNG</div>
+    <div class="seal">
+      <span>🔒</span>
+      <span>PHÒNG<br>LƯU TRỮ</span>
+    </div>
+    <h1>Quản Trị Sổ Lưu Bút</h1>
+    <p class="sub">Khu vực dành riêng cho người quản lý trang lưu niệm của Cloudy &amp; Yan. Vui lòng nhập mật khẩu để mở cửa phòng lưu trữ.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="passwordInput">MẬT KHẨU</label>
+        <input type="password" id="passwordInput" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-send" id="loginBtn">MỞ KHÓA 🔑</button>
+      <div class="form-msg" id="loginMsg"></div>
+    </form>
+  </div>
+</div>
+
+<div id="dashboard" class="dashboard hidden">
+  <header class="admin-header">
+    <div>
+      <div class="eyebrow">PHÒNG LƯU TRỮ</div>
+      <h1>Quản Lý Lời Chúc — Cloudy &amp; Yan</h1>
+    </div>
+    <div class="admin-actions">
+      <span class="count-badge" id="countBadge">0 lá thư</span>
+      <button id="logoutBtn" class="btn-ghost" type="button">ĐÓNG CỬA &amp; ĐĂNG XUẤT</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <input type="search" id="searchInput" placeholder="Tìm theo tên hoặc nội dung lời chúc...">
+  </div>
+
+  <main class="cards-wrap" id="cardsWrap"></main>
+  <p class="empty-state hidden" id="dashEmpty">Chưa có lá thư nào trong sổ lưu bút.</p>
+</div>
+
+<div id="editModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="eyebrow">CHỈNH SỬA LÁ THƯ</div>
+    <div class="field">
+      <label for="editName">TÊN NGƯỜI GỬI</label>
+      <input type="text" id="editName" maxlength="40">
+    </div>
+    <div class="field">
+      <label for="editMessage">LỜI CHÚC</label>
+      <textarea id="editMessage" maxlength="400"></textarea>
+    </div>
+    <div class="form-msg" id="editMsg"></div>
+    <div class="modal-actions">
+      <button id="editCancel" class="btn-ghost" type="button">HỦY</button>
+      <button id="editSave" class="btn-send" type="button">LƯU THAY ĐỔI</button>
+    </div>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="eyebrow" style="color:var(--stamp-red)">XÁC NHẬN XÓA</div>
+    <p id="deleteText">Bạn có chắc muốn xóa lá thư này khỏi sổ lưu bút? Hành động này không thể hoàn tác.</p>
+    <div class="modal-actions">
+      <button id="deleteCancel" class="btn-ghost" type="button">HỦY</button>
+      <button id="deleteConfirm" class="btn-danger" type="button">XÓA VĨNH VIỄN</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {
+  getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { firebaseConfig, ADMIN_EMAIL, LETTERS_COLLECTION } from "./firebase-config.js";
+
+var app = initializeApp(firebaseConfig);
+var auth = getAuth(app);
+var db = getFirestore(app);
+
+var loginScreen = document.getElementById('loginScreen');
+var dashboard = document.getElementById('dashboard');
+var loginForm = document.getElementById('loginForm');
+var passwordInput = document.getElementById('passwordInput');
+var loginBtn = document.getElementById('loginBtn');
+var loginMsg = document.getElementById('loginMsg');
+var logoutBtn = document.getElementById('logoutBtn');
+var searchInput = document.getElementById('searchInput');
+var cardsWrap = document.getElementById('cardsWrap');
+var dashEmpty = document.getElementById('dashEmpty');
+var countBadge = document.getElementById('countBadge');
+
+var editModal = document.getElementById('editModal');
+var editName = document.getElementById('editName');
+var editMessage = document.getElementById('editMessage');
+var editMsg = document.getElementById('editMsg');
+var editSave = document.getElementById('editSave');
+var editCancel = document.getElementById('editCancel');
+
+var deleteModal = document.getElementById('deleteModal');
+var deleteText = document.getElementById('deleteText');
+var deleteConfirm = document.getElementById('deleteConfirm');
+var deleteCancel = document.getElementById('deleteCancel');
+
+var allLetters = [];
+var unsubscribeLetters = null;
+var currentEditId = null;
+var currentDeleteId = null;
+
+/* ---------- auth ---------- */
+onAuthStateChanged(auth, function(user){
+  if(user){
+    loginScreen.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    loginMsg.textContent = '';
+    passwordInput.value = '';
+    startListening();
+  } else {
+    dashboard.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+    if(unsubscribeLetters){ unsubscribeLetters(); unsubscribeLetters = null; }
+  }
+});
+
+loginForm.addEventListener('submit', function(e){
+  e.preventDefault();
+  var pw = passwordInput.value;
+  if(!pw){ return; }
+  loginBtn.disabled = true;
+  loginMsg.className = 'form-msg';
+  loginMsg.textContent = 'Đang mở khóa...';
+  signInWithEmailAndPassword(auth, ADMIN_EMAIL, pw).catch(function(err){
+    console.error(err);
+    loginMsg.className = 'form-msg err';
+    loginMsg.textContent = 'Sai mật khẩu, hoặc chưa thiết lập tài khoản quản trị.';
+  }).finally(function(){
+    loginBtn.disabled = false;
+  });
+});
+
+logoutBtn.addEventListener('click', function(){
+  signOut(auth);
+});
+
+/* ---------- letters listener ---------- */
+function startListening(){
+  var lettersQuery = query(collection(db, LETTERS_COLLECTION), orderBy('createdAt', 'desc'));
+  unsubscribeLetters = onSnapshot(lettersQuery, function(snapshot){
+    allLetters = snapshot.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
+    renderCards();
+  }, function(err){
+    console.error(err);
+    dashEmpty.textContent = 'Không thể tải sổ lưu bút. Vui lòng kiểm tra kết nối hoặc quyền truy cập Firestore.';
+    dashEmpty.classList.remove('hidden');
+  });
+}
+
+function renderCards(){
+  var term = searchInput.value.trim().toLowerCase();
+  var filtered = allLetters.filter(function(item){
+    if(!term){ return true; }
+    return (item.name || '').toLowerCase().indexOf(term) !== -1 ||
+           (item.message || '').toLowerCase().indexOf(term) !== -1;
+  });
+
+  cardsWrap.innerHTML = '';
+  countBadge.textContent = allLetters.length + ' lá thư';
+
+  if(filtered.length === 0){
+    dashEmpty.textContent = allLetters.length === 0
+      ? 'Chưa có lá thư nào trong sổ lưu bút.'
+      : 'Không tìm thấy lá thư phù hợp.';
+    dashEmpty.classList.remove('hidden');
+    return;
+  }
+  dashEmpty.classList.add('hidden');
+
+  filtered.forEach(function(item, i){
+    var card = document.createElement('div');
+    card.className = 'postcard';
+    card.style.setProperty('--r', ((i % 2 === 0) ? '-1deg' : '1deg'));
+
+    var nameEl = document.createElement('p');
+    nameEl.className = 'pc-name';
+    nameEl.textContent = item.name || '(không tên)';
+
+    var dateEl = document.createElement('span');
+    dateEl.className = 'pc-date';
+    dateEl.textContent = item.date || '';
+
+    var msgEl = document.createElement('p');
+    msgEl.className = 'pc-msg';
+    msgEl.textContent = item.message || '';
+
+    card.appendChild(nameEl);
+    card.appendChild(dateEl);
+    if(item.editedAt){
+      var editedEl = document.createElement('span');
+      editedEl.className = 'pc-edited';
+      editedEl.textContent = '(đã chỉnh sửa bởi quản trị viên)';
+      card.appendChild(editedEl);
+    }
+    card.appendChild(msgEl);
+
+    var actions = document.createElement('div');
+    actions.className = 'pc-actions';
+
+    var editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'btn-icon';
+    editBtn.textContent = 'SỬA ✎';
+    editBtn.addEventListener('click', function(){ openEdit(item); });
+
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn-icon danger';
+    delBtn.textContent = 'XÓA ✕';
+    delBtn.addEventListener('click', function(){ openDelete(item); });
+
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+    card.appendChild(actions);
+
+    cardsWrap.appendChild(card);
+  });
+}
+
+searchInput.addEventListener('input', renderCards);
+
+/* ---------- edit modal ---------- */
+function openEdit(item){
+  currentEditId = item.id;
+  editName.value = item.name || '';
+  editMessage.value = item.message || '';
+  editMsg.textContent = '';
+  editMsg.className = 'form-msg';
+  editModal.classList.remove('hidden');
+  editName.focus();
+}
+function closeEdit(){
+  editModal.classList.add('hidden');
+  currentEditId = null;
+}
+editCancel.addEventListener('click', closeEdit);
+editModal.addEventListener('click', function(e){ if(e.target === editModal){ closeEdit(); } });
+
+editSave.addEventListener('click', function(){
+  var name = editName.value.trim();
+  var message = editMessage.value.trim();
+  if(!name || !message){
+    editMsg.className = 'form-msg err';
+    editMsg.textContent = 'Vui lòng nhập đầy đủ tên và lời chúc.';
+    return;
+  }
+  editSave.disabled = true;
+  updateDoc(doc(db, LETTERS_COLLECTION, currentEditId), {
+    name: name,
+    message: message,
+    editedAt: serverTimestamp()
+  }).then(function(){
+    closeEdit();
+  }).catch(function(err){
+    console.error(err);
+    editMsg.className = 'form-msg err';
+    editMsg.textContent = 'Lưu thất bại. Vui lòng thử lại.';
+  }).finally(function(){
+    editSave.disabled = false;
+  });
+});
+
+/* ---------- delete modal ---------- */
+function openDelete(item){
+  currentDeleteId = item.id;
+  deleteText.textContent = 'Bạn có chắc muốn xóa lá thư của "' + (item.name || '(không tên)') + '" khỏi sổ lưu bút? Hành động này không thể hoàn tác.';
+  deleteModal.classList.remove('hidden');
+}
+function closeDelete(){
+  deleteModal.classList.add('hidden');
+  currentDeleteId = null;
+}
+deleteCancel.addEventListener('click', closeDelete);
+deleteModal.addEventListener('click', function(e){ if(e.target === deleteModal){ closeDelete(); } });
+
+deleteConfirm.addEventListener('click', function(){
+  if(!currentDeleteId){ return; }
+  deleteConfirm.disabled = true;
+  deleteDoc(doc(db, LETTERS_COLLECTION, currentDeleteId)).then(function(){
+    closeDelete();
+  }).catch(function(err){
+    console.error(err);
+  }).finally(function(){
+    deleteConfirm.disabled = false;
+  });
+});
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){ closeEdit(); closeDelete(); }
+});
+</script>
+
+</body>
+</html>
